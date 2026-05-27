@@ -14,9 +14,20 @@ Portable, project-agnostic [Claude Code](https://claude.com/claude-code) skills
 Symlinks every skill here into `~/.claude/skills/` (Claude Code's personal
 skills directory). Re-run after adding skills; safe to run repeatedly.
 
+**macOS / Linux:**
+
 ```sh
 ./install.sh
 ```
+
+**Windows (PowerShell):**
+
+```powershell
+.\install.ps1
+```
+
+> Symlinks on Windows require **Developer Mode** or **Administrator** privileges.
+> The script will tell you how to enable this if needed.
 
 Skills are picked up by new Claude Code sessions. Update a skill by editing it
 here and committing — the symlink means installed copies track the repo.

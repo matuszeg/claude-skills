@@ -1,6 +1,7 @@
 ---
 name: session-wrap
 description: Use at the end of any working session before context is abandoned or a new session starts — when handing off, "wrapping up", running low on context, or switching tasks/sessions and the next session must continue with zero carry-over confusion.
+allowed-tools: Bash(git status*), Bash(git branch*), Bash(gh pr list*)
 ---
 
 # Session Wrap

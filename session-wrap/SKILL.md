@@ -96,10 +96,31 @@ the current branch or default branch). Report per repo: deleted branches, or
 "none". Any branch `-d` refuses, or any open PR, is surfaced explicitly, not
 just logged.
 
-### 6 — Next-session handoff (single copyable block)
-Emit ONE ` ```text ` fenced block, nothing required after it, written as an
-imperative directive prompt addressed to the next session (not a status
-report about this one). It contains exactly:
+### 6 — Present the wrap in two sections (Actionable, then Informational)
+Everything surfaced by steps 1–5 goes into the response under two
+clearly-labeled headings, in this order:
+
+**Actionable** — anything the user must do, must decide, or must see because it
+is or could be acted upon. Route here: deletion candidates awaiting per-item
+approval (step 3), loose threads still needing a decision or an owner (step 4),
+a dirty working tree, any branch `git branch -d` refused, open PRs waiting on
+the user (step 5), any failing test the user should know about (including
+pre-existing or unrelated ones — surface it, do not bury it as "not mine"), and
+any open question raised this session. If there is genuinely nothing, write
+"Actionable: none" — but only after checking.
+
+**Informational** — state now durably captured that needs no action, for
+awareness only. Route here: the CLAUDE.md current-state note (step 1), memories
+written (step 2), the per-memory audit disposition list (step 3), branches
+auto-deleted (step 5), and where each loose thread was filed (step 4).
+
+Put each item under exactly one heading. When unsure which, put it under
+**Actionable** so it cannot be missed.
+
+### 7 — Next-session handoff (single copyable block)
+After both sections, emit ONE ` ```text ` fenced block, nothing required after
+it, written as an imperative directive prompt addressed to the next session
+(not a status report about this one). It contains exactly:
 1. The first concrete action (specific skill/command/task).
 2. Gating: PRs that must merge / sign-offs needed before that action, or "none".
 3. Context NOT already in CLAUDE.md / project docs / memory, or "none".
@@ -117,6 +138,8 @@ this block to a file; it is a one-use artifact that expires when pasted.
 | Deleting memory because rationale "seems airtight" | Never without explicit per-item user approval. |
 | `git status` clean ⇒ git hygiene done | Also check branches and PRs; verify by running, not asserting. |
 | Stating git/PR state without running commands | Fabricated certainty. Run the commands. |
+| One undifferentiated list of findings | Split the response into **Actionable** then **Informational** before the handoff block. |
+| Actionable item buried under Informational | When unsure, it goes under Actionable. Decisions, approvals, dirty git, open PRs are always Actionable. |
 | Handoff as prose, or split prose+code, or written to a file | One copyable ```text block, in the response, nothing after it. |
 | Inventing `SESSION_WRAP.md`/throwaway docs for handoff | Durable channels + the one block only. No invented files. |
 | "We'll pick this up later" with no tracking | Every loose thread lands in tracker/decision doc/memory before ending. |
@@ -124,6 +147,8 @@ this block to a file; it is a one-use artifact that expires when pasted.
 
 ## Definition of Done
 
-All 6 steps done. Next session can start from CLAUDE.md + project docs +
-memory + the handoff block alone, with no need to read this session. Every
-item needing user action was surfaced in the response, not only in memory.
+All 7 steps done. The response presents an **Actionable** section then an
+**Informational** section, followed by the handoff block. Next session can
+start from CLAUDE.md + project docs + memory + the handoff block alone, with no
+need to read this session. Every item needing user action appears in the
+Actionable section, not only in memory.

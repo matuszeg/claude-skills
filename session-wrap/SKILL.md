@@ -50,6 +50,17 @@ memory index (`MEMORY.md`); never write memory content into the index itself.
 If the project has no memory directory, say so and put durable facts in the
 agreed docs instead — do not silently skip capture.
 
+**Memory holds durable, non-derivable facts** — decisions + their rationale, ops
+techniques, conventions, gotchas. **Status, work, and history belong to the issue
+tracker, VCS, and CI — memory POINTS to them, never re-narrates them.** Do NOT
+write "PR #X open → merged → deployed", commit SHAs, gate/coverage numbers, or an
+enumerated issue backlog into a memory file; the tracker and `git log` already
+own those, and they churn every session. Smell test: if you'd find a fact via
+`git log` / `gh` / the project board, link to it, don't copy it. When a fact's
+*status* changes, **edit the existing line in place — never append a new stanza.**
+A "state" memory must read as current state, not a session-by-session changelog;
+that drift is the single biggest source of memory bloat.
+
 ### 3 — Memory audit & deletion candidates (single pass)
 **Default scope:** Only audit memory files that were read, written, or
 referenced during this session — these are the ones most likely to be stale.
@@ -68,10 +79,18 @@ pass determine:
   notes for failure modes now structurally prevented, spent per-iteration
   artifacts. For each candidate: file, one-line content, why eligible, risk of
   keeping, where the value survives otherwise.
+- Whether the file has **drifted into a changelog** — a "state" memory that has
+  accumulated session-by-session status narration (PR/issue transitions, SHAs,
+  gate numbers, a duplicated backlog) is bloated by construction. Flag it as a
+  **consolidation candidate**: keep the durable core (decisions/ops/gotchas),
+  replace the status narration with pointers to the tracker/VCS. A heavy
+  consolidation is high-impact, so surface it for approval like a deletion
+  candidate (the per-item-approval rule applies before a big rewrite).
 
 **Required output:** a per-memory disposition list — one line per file
 inspected, each marked `unchanged` / `body-updated` / `index-updated` /
-`deletion-candidate`. If you cannot produce this list you did not do the audit.
+`deletion-candidate` / `consolidation-candidate`. If you cannot produce this list
+you did not do the audit.
 
 **Hard rule: never delete a memory or section without explicit per-item user
 approval.** "Yes earlier" does not carry across files. If the user is absent,
@@ -144,6 +163,7 @@ this block to a file; it is a one-use artifact that expires when pasted.
 | Inventing `SESSION_WRAP.md`/throwaway docs for handoff | Durable channels + the one block only. No invented files. |
 | "We'll pick this up later" with no tracking | Every loose thread lands in tracker/decision doc/memory before ending. |
 | Findings written only to memory and called "flagged" | User is present now — surface in the response. |
+| State memory reads as a session-by-session changelog (PR/issue status, SHAs, gate numbers, duplicated backlog) | The tracker + `git`/CI own status & history. Memory holds durable facts and *points*. Edit a "current" line in place; never append a per-session log. |
 
 ## Definition of Done
 

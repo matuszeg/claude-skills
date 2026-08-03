@@ -54,11 +54,15 @@ There are two fields:
 
 **To set the main description: click the field, then `type`.** The most reliable way to reach and focus it: click **List it**, then click the **"Description"** link in the red error banner — that jumps to and focuses the field. Then click inside the box and type.
 
+**The hidden textarea only syncs on blur.** Right after typing, `description` still reads `len: 0` — that is expected, not a failure. Click something outside the editor first, *then* verify.
+
 **Always verify before publishing:**
 ```js
 Array.from(document.querySelectorAll('textarea')).map(t => ({n: t.name, len: t.value.length}))
 // the entry named "description" must have len > 0
 ```
+
+**A long `type` into this field often returns `CDP sendCommand "Input.dispatchKeyEvent" timed out`** while having actually typed the whole string. Don't retype on that error — screenshot, and run the verification above. Retyping blind duplicates the description.
 
 ### Price
 eBay's Pricing panel shows **"Recommended price"** drawn from actual sold listings in the last 90 days. This is better data than any external estimate — external sold-comp scraping is blocked, so this panel is the best sold-price signal available. Read it with:
@@ -68,6 +72,8 @@ eBay's Pricing panel shows **"Recommended price"** drawn from actual sold listin
   return (i>=0 ? t.slice(i,i+35).replace(/\n/g,' | ') : 'NO REC') + ' || field=' + (p?p.value:'?'); })()
 ```
 The prefilled price is often NOT the recommendation — compare and set explicitly. Leave **Allow offers ON** so buyers can negotiate.
+
+**⚠️ The recommended price assumes FREE shipping.** The panel prints it as e.g. "$15.00 | Free shipping" — that is a *total-to-buyer* figure, not an item-value figure. With calculated shipping the buyer pays that item price **plus** postage **plus** handling, so listing at the recommendation puts the all-in cost far above the comps it was derived from. Subtract a realistic postage estimate from the recommendation to get the item price, then say so to the user: this is a real speed-vs-margin tradeoff and it's their call, not a silent adjustment.
 
 ### Quantity
 **eBay forbids two identical fixed-price listings of the same item.** For multiples, set **Quantity** on ONE listing. Say "3 available" in the description too.
@@ -117,7 +123,20 @@ Same field mechanics apply. Useful for bulk-changing shipping across many listin
 
 ## Getting photos from Google Photos
 
-If the user's photos live in Google Photos share links (`photos.app.goo.gl/...`), downloads via the UI usually fail (hidden save dialogs). This works instead:
+If the user's photos live in Google Photos share links (`photos.app.goo.gl/...`), downloads via the UI usually fail (hidden save dialogs).
+
+**Try this first — no browser needed.** A share link is publicly fetchable, and the full-size image URLs are embedded in the HTML:
+
+```bash
+curl -sL "<share-link>" -o /tmp/album.html
+grep -oE 'https://lh3\.googleusercontent\.com/pw/[A-Za-z0-9_\-]+' /tmp/album.html | sort -u
+# then, per URL:
+curl -sL "<url>=d" -o photos/<name>.jpg
+```
+
+One `curl` per photo and you're done. Confirm you got originals with `file photos/*.jpg` — real phone photos read as 3000x4000 or similar, and the EXIF shows the camera. Small dimensions mean you grabbed thumbnails.
+
+**The browser route below is the fallback**, and note that **`javascript_tool` is blocked on `photos.google.com`** ("Permission denied for JavaScript execution on this domain"), so the snippets only run if the user grants that domain in the extension. `read_page` still works and exposes the per-photo `/photo/` hrefs without JavaScript.
 
 1. Navigate to the share link, wait, then list the photo pages:
    ```js

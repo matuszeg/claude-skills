@@ -8,6 +8,7 @@ Portable, project-agnostic [Claude Code](https://claude.com/claude-code) skills
 | Skill | Use when |
 |---|---|
 | [`ebay-listing`](ebay-listing/SKILL.md) | Listing or revising anything on eBay — drives the browser through the full publish flow, with the form quirks and shipping setup already solved. |
+| [`facebook-marketplace`](facebook-marketplace/SKILL.md) | Listing on Facebook Marketplace or cross-posting eBay items to local buyers — the three-step form, group cross-posts, and the duplicate-listing trap. |
 | [`session-wrap`](session-wrap/SKILL.md) | Ending a session / handing off / low on context — so the next session starts with zero carry-over confusion. |
 
 ## Install

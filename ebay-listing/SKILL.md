@@ -96,7 +96,21 @@ Three options, and the choice materially affects whether the seller loses money:
 3. Click **"See shipping options"** (top-right of the SHIPPING section) → toggle **"Handling cost"** ON → close the menu.
 4. A **"Handling cost (optional)"** field appears below "Add additional services." **Triple-click it and type** — a plain click+type will not replace the existing `0.00`.
 
-**Package weight/dimensions:** eBay autofills these from "similar listings" and they are **frequently too small**, especially for anything double-boxed or oversized. Always override with the real packed box. Getting this wrong means the seller eats the difference on every label.
+The field is `input[name="handlingFee"]` — a stable selector, unlike element refs.
+
+**Package weight/dimensions:** eBay autofills these from "similar listings" and they are **frequently wrong in both directions**. Always override with the real packed box. Getting this wrong means the seller eats the difference on every label, or prices the listing out of the market.
+
+**Look the part up on partstown.com before guessing.** For appliance/equipment parts it publishes manufacturer dimensions, which beats both eBay's estimator and eyeballing a photo:
+
+```
+partstown.com → search the bare part number (e.g. 241511601)
+  → product page → SPECS tab → Length / Width / Height / Weight
+```
+The FITS MODELS tab also lists every compatible model — good material for the description and for buyer "will this fit?" questions. Sears PartsDirect does not publish dimensions; Parts Town does.
+
+Real example: eBay estimated a freezer door bin at 16.3 × 12 × 7.9 @ 2 lb. Parts Town gave the actual part as **11.7 × 7.7 × 4.9 @ 0.57 lb** — roughly half the volume. Boxed at 14 × 10 × 6, the buyer's postage fell from $8.43–$23.89 to $6.65–$12.87.
+
+Add ~1–2 in per side to the part dimensions for padding, then round to a real stock carton size.
 
 **Dimensional weight:** boxes over ~1 cubic foot bill on volume, not actual weight (139 divisor). A big-but-light item in an oversized box costs like a much heavier parcel. Use the smallest box that fits.
 
@@ -112,6 +126,33 @@ Three options, and the choice materially affects whether the seller loses money:
 https://www.ebay.com/lstng?mode=ReviseItem&itemId=<ITEM_ID>
 ```
 Same field mechanics apply. Useful for bulk-changing shipping across many listings.
+
+### Bulk revising: the loop that actually works
+
+Setting an input's `.value` from `javascript_tool` **does not stick**, even with the React native-setter trick plus `input`/`change` events. The DOM shows the new value, "Revise it" reports success, and a reload shows the OLD value. Verified twice — don't use it. Only real typing registers.
+
+Per listing, in ONE `browser_batch`:
+1. `navigate` to the revise URL, then `wait` 8–10s (the form is slow; a short wait leaves `handlingFee` undefined)
+2. `javascript_tool`: `document.querySelector('input[name="handlingFee"]').scrollIntoView({block:'center'})` and return its value
+3. `wait` 2s — the layout is still settling right after navigation
+4. **`screenshot`** ← not optional, see below
+5. `triple_click` the field, `type` the new value, `key` Tab
+6. `javascript_tool` **guarded submit** — re-read the field and only click "Revise it" if it holds the intended value:
+   ```js
+   (()=>{const v=document.querySelector('input[name="handlingFee"]').value;
+     if(v!=='10.00') return 'ABORT val='+v;
+     const b=Array.from(document.querySelectorAll('button')).find(b=>b.innerText.trim()==='Revise it');
+     if(!b) return 'ABORT no btn'; b.click(); return 'SUBMITTED';})()
+   ```
+7. `wait` 7s, then assert `document.body.innerText.includes('has been revised')`
+
+**A fresh `screenshot` must immediately precede the click.** Without one in the same batch, `triple_click` at correct coordinates silently misses — the typing goes nowhere and the field keeps its old value. Cost several confusing retries where the field was plainly visible at the clicked coordinates.
+
+**Getting the coordinate:** after `scrollIntoView({block:'center'})` the field sits at a fixed spot. Convert CSS px to screenshot px with `scale = 1568 / window.innerWidth` (screenshots are letterboxed to 1568 wide regardless of viewport). At a 1848px viewport that put the handling field at **(451, 337)**.
+
+**Keep batches to ONE listing** (~11 actions). Two or three listings per batch times out mid-run, leaving some silently unrevised.
+
+**Always re-verify afterward** by reloading each revise URL and reading the field back. In a 13-listing run, two listings were dropped by a timed-out batch and would have been reported as done. The guarded submit catches bad typing; only a reload catches a batch that never ran.
 
 ## Claude-in-Chrome extension quirks
 

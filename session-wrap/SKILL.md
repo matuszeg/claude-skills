@@ -115,6 +115,26 @@ the current branch or default branch). Report per repo: deleted branches, or
 "none". Any branch `-d` refuses, or any open PR, is surfaced explicitly, not
 just logged.
 
+### 5b — Push the memory repo (multi-machine sync)
+If the project's memory directory is a git working tree, the memories written in
+steps 2–3 exist only on this machine until they are pushed. Commit and push
+them, and surface the result:
+
+```
+git -C <memory-dir> add -A
+git -C <memory-dir> commit -m "<session topic>: <what changed>"
+git -C <memory-dir> pull --rebase --autostash && git -C <memory-dir> push
+```
+
+A `SessionStart` hook pulls at the start, so the common case is fast-forward.
+`MEMORY.md` carries a `merge=union` attribute, so index appends from two
+machines auto-merge — **read the merged index afterwards** and remove any
+duplicate or contradictory pointer lines the union produced. A genuine conflict
+in a memory *body* is Actionable: surface it, do not resolve it by picking a
+side silently.
+
+If the directory is not a git tree, skip this step without comment.
+
 ### 6 — Present the wrap in two sections (Actionable, then Informational)
 Everything surfaced by steps 1–5 goes into the response under two
 clearly-labeled headings, in this order:

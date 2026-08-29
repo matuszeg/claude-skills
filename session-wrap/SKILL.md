@@ -156,6 +156,24 @@ auto-deleted (step 5), and where each loose thread was filed (step 4).
 Put each item under exactly one heading. When unsure which, put it under
 **Actionable** so it cannot be missed.
 
+### 6b — Walk the Actionable items ONE AT A TIME
+Do not end the wrap on the list. After presenting both sections, take the
+Actionable items in order, one per message: state the item, what you think
+should happen, and stop for the user's answer. Move to the next only when they
+say so. A list of five decisions delivered at once gets skimmed and half of it
+is silently dropped; one at a time is how each actually gets a decision.
+
+- **Re-check each item the moment you reach it.** Anything that resolved itself
+  since you wrote the list — a hook that has now fired, a check that has since
+  passed — is reported as resolved and closed, not re-raised. Repeating an item
+  you already have the evidence against is how the section loses its meaning.
+- **Say what you would do**, do not just re-read the item back. Each one ends in
+  a decision, a "yours to run", or a closure.
+- If an item is genuinely the user's to run elsewhere, confirm that and move on;
+  do not stall the walk waiting for them to do it.
+- Emit the handoff block (step 7) only after the last item is closed, so it
+  reflects the decisions just made rather than the state before them.
+
 ### 7 — Next-session handoff (single copyable block)
 After both sections, emit ONE ` ```text ` fenced block, nothing required after
 it, written as an imperative directive prompt addressed to the next session
@@ -179,6 +197,8 @@ this block to a file; it is a one-use artifact that expires when pasted.
 | Stating git/PR state without running commands | Fabricated certainty. Run the commands. |
 | One undifferentiated list of findings | Split the response into **Actionable** then **Informational** before the handoff block. |
 | Actionable item buried under Informational | When unsure, it goes under Actionable. Decisions, approvals, dirty git, open PRs are always Actionable. |
+| Actionable list presented as one block and the wrap ends | Walk the items one at a time (step 6b). Each gets its own message and its own decision. |
+| Re-raising an item that resolved itself before you reached it | Re-check at the moment you reach it; report it resolved and close it. |
 | Handoff as prose, or split prose+code, or written to a file | One copyable ```text block, in the response, nothing after it. |
 | Inventing `SESSION_WRAP.md`/throwaway docs for handoff | Durable channels + the one block only. No invented files. |
 | "We'll pick this up later" with no tracking | Every loose thread lands in tracker/decision doc/memory before ending. |
@@ -188,7 +208,8 @@ this block to a file; it is a one-use artifact that expires when pasted.
 ## Definition of Done
 
 All 7 steps done. The response presents an **Actionable** section then an
-**Informational** section, followed by the handoff block. Next session can
+**Informational** section; every Actionable item has been walked one at a time
+and closed; the handoff block comes last. Next session can
 start from CLAUDE.md + project docs + memory + the handoff block alone, with no
 need to read this session. Every item needing user action appears in the
 Actionable section, not only in memory.

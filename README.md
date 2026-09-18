@@ -28,8 +28,10 @@ skills directory). Re-run after adding skills; safe to run repeatedly.
 .\install.ps1
 ```
 
-> Symlinks on Windows require **Developer Mode** or **Administrator** privileges.
-> The script will tell you how to enable this if needed.
+> On Windows the script links each skill with a junction, which needs no special
+> privileges. It falls back to a symlink -- which does need **Developer Mode**
+> or **Administrator** -- only when this repo lives somewhere a junction cannot
+> reach, such as a network share or inside a WSL distro. It tells you if so.
 
 Skills are picked up by new Claude Code sessions. Update a skill by editing it
-here and committing — the symlink means installed copies track the repo.
+here and committing — the link means installed copies track the repo.
